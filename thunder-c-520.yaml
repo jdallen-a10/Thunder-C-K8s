@@ -1,0 +1,57 @@
+ apiVersion: apps/v1
+ kind: Deployment
+ metadata:
+   name: thunder-c-520
+ spec:
+   selector:
+     matchLabels:
+       app: thunder-c-520
+   replicas: 1
+   template:
+     metadata:
+       labels:
+         app: thunder-c-520
+       annotations:
+         prometheus.io/scrape: "true"
+         prometheus.io/port: "443"
+         prometheus.io/path: "/metrics"
+         k8s.v1.cni.cncf.io/networks: data-in, data-out
+     spec:
+       containers:
+       - name: thunder-c-520
+         image: 10.47.1.30:5000/acos_docker_5_2_0-p1_31:latest
+         imagePullPolicy: IfNotPresent
+         env:
+         - name: ACOS_CTH_SUPPORT_MGMT
+           value: "y"
+         - name: ACOS_CTH_SUPPORT_VETH
+           value: "y"
+         - name: ACOS_CTH_PRODUCT
+           value: "ADC"
+         - name: ACOS_CTH_VETH_DRIVER_LST
+           value: "veth,macvlan"
+         resources:
+           requests:
+             memory: 4Gi
+             cpu: "2"
+           limits:
+             memory: 4Gi
+             cpu: "4"
+         ports:
+         - containerPort: 80
+         - containerPort: 22
+         - containerPort: 443
+         securityContext:
+           privileged: true
+           runAsUser: 0
+           capabilities:
+               add: ["SYS_ADMIN", "NET_ADMIN","IPC_LOCK"]
+         startupProbe:
+           exec:
+             command:
+             - cat
+             - /var/run/alb.done
+           initialDelaySeconds: 600
+           periodSeconds: 30
+           failureThreshold: 60
+
