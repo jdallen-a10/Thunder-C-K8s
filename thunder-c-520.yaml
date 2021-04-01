@@ -51,7 +51,7 @@
              command:
              - cat
              - /var/run/alb.done
-           initialDelaySeconds: 600
+           initialDelaySeconds: 300
            periodSeconds: 30
-           failureThreshold: 60
+           failureThreshold: 30
 
